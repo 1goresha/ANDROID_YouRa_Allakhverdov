@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Poster App</string>
+    <string name="text1">Hello</string>
+    <string name="text2">Android</string>
 </resources>
