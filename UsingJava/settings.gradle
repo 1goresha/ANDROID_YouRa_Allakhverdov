@@ -1,0 +1,2 @@
+rootProject.name='Using Java'
+include ':app'
