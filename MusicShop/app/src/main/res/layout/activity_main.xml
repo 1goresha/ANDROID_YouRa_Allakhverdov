@@ -156,5 +156,6 @@
         android:layout_margin="20dp"
         android:textColor="@android:color/white"
         android:text="ADD TO CART"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:onClick="makeOrder"/>
 </LinearLayout>

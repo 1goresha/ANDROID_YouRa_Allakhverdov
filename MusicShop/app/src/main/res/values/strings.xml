@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Music Shop</string>
+    <string name="order">My Order</string>
 </resources>

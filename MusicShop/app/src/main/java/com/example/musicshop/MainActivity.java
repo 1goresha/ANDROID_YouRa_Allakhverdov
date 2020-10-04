@@ -2,10 +2,12 @@ package com.example.musicshop;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -19,12 +21,14 @@ public class MainActivity extends AppCompatActivity {
     int quantity = 0;
     TextView quantityTextView;
     Spinner spinner;
-    List arrayList;
-    HashMap goodsMap;
+    List<String> arrayList;
+    HashMap<String, Double> goodsMap;
     TextView textViewPrice;
     String selectedItemFormSpinner;
+    Double orderPrice;
     Double price;
     ImageView goodsImage;
+    EditText customerName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         quantityTextView = findViewById(R.id.quantity);
         textViewPrice = findViewById(R.id.price);
         goodsImage = findViewById(R.id.goodsImage);
+        customerName = findViewById(R.id.editText2);
 
         createSpinner();
         createGoodsMap();
@@ -43,9 +48,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedItemFormSpinner = spinner.getSelectedItem().toString();
-                Double priceDouble = (Double) goodsMap.get(selectedItemFormSpinner);
-                price = quantity * priceDouble;
-                textViewPrice.setText(price + "");
+                Double priceDouble = goodsMap.get(selectedItemFormSpinner);
+                orderPrice = quantity * priceDouble;
+                textViewPrice.setText(orderPrice + "");
 
                 switch (selectedItemFormSpinner) {
                     case "drums":
@@ -69,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void createSpinner() {
         spinner = findViewById(R.id.selectSpinner);
-        arrayList = new ArrayList();
+        arrayList = new ArrayList<>();
         arrayList.add("guitar");
         arrayList.add("drums");
         arrayList.add("piano");
@@ -79,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void createGoodsMap() {
-        goodsMap = new HashMap();
+        goodsMap = new HashMap<>();
         goodsMap.put("guitar", 1000.0);
         goodsMap.put("drums", 1500.0);
         goodsMap.put("piano", 2000.0);
@@ -87,9 +92,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void increase(View view) {
         quantityTextView.setText(++quantity + "");
-        Double priceDouble = (Double) goodsMap.get(selectedItemFormSpinner);
-        price = quantity * priceDouble;
-        textViewPrice.setText(price + "");
+        price = goodsMap.get(selectedItemFormSpinner);
+        orderPrice = quantity * price;
+        textViewPrice.setText(orderPrice + "");
     }
 
     public void decrease(View view) {
@@ -98,9 +103,25 @@ public class MainActivity extends AppCompatActivity {
             quantity++;
         }
         quantityTextView.setText(quantity + "");
-        Double priceDouble = (Double) goodsMap.get(selectedItemFormSpinner);
-        price = quantity * priceDouble;
-        textViewPrice.setText(price + "");
+        price = goodsMap.get(selectedItemFormSpinner);
+        orderPrice = quantity * price;
+        textViewPrice.setText(orderPrice + "");
     }
 
+    public void makeOrder(View view) {
+        Order order = new Order();
+        order.setCustomerName(customerName.getText().toString());
+        order.setGoodsName(selectedItemFormSpinner);
+        order.setQuantity(quantity);
+        order.setPrice(price);
+        order.setOrderPrice(orderPrice);
+
+        Intent mainIntent = new Intent(this, OrderActivity.class);
+        mainIntent.putExtra("customerName", order.getCustomerName());
+        mainIntent.putExtra("goodsName", order.getGoodsName());
+        mainIntent.putExtra("quantity", order.getQuantity());
+        mainIntent.putExtra("price", order.getPrice());
+        mainIntent.putExtra("orderPrice", order.getOrderPrice());
+        startActivity(mainIntent);
+    }
 }
