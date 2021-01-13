@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="sound_labels">
+        <item>Siren</item>
+        <item>Bell</item>
+        <item>Bip</item>
+    </string-array>
+
+    <string-array name="sound_values">
+        <item>siren</item>
+        <item>bell</item>
+        <item>bip</item>
+    </string-array>
+
+</resources>
