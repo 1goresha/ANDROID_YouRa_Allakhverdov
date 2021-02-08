@@ -1,7 +1,5 @@
 package com.example.ble;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -11,82 +9,115 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 //    BLEScanCallback bleScanCallback;
-    final int ACCESS_COARSE_LOCATION_REQUEST = 1;
-    TextView textView;
 
-    private boolean hasPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (getApplicationContext().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, ACCESS_COARSE_LOCATION_REQUEST);
-                return false;
-            }
-        }
-        return true;
-    }
+    final String TAG = "scan";
+    List<ScanFilter> scanFilterList;
+    final int SCAN_PERIOD = 10000;
+    TextView textView;
+    Spinner spinner;
+    List<String> arrayList;
+    ArrayAdapter arrayAdapter;
+    HashSet<String> hashSetNames;
 
     // Device scan callback.
-    private ScanCallback scanCallback = new ScanCallback() {
+    private final ScanCallback scanCallback = new ScanCallback() {
 
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
 //            super.onScanResult(callbackType, result);
             BluetoothDevice bluetoothDevice = result.getDevice();
-            Log.d("scan", "Scan Success");
-            textView.setText(bluetoothDevice.getName());
+            Log.d(TAG, "Scan Success");
+            String deviceName = bluetoothDevice.getName();
+            textView.append(deviceName + "|||");
+            if (deviceName != null){
+//                arrayList.add(deviceName);
+                hashSetNames.add(deviceName);
+            }
         }
 
         @Override
         public void onBatchScanResults(List<ScanResult> results) {
 //            super.onBatchScanResults(results);
-            Log.d("scan", "Scan Success Batch");
+            Log.d(TAG, "Scan Success Batch");
+            arrayList.clear();
+            BluetoothDevice bluetoothDevice;
+            for (ScanResult scanResult : results){
+                bluetoothDevice = scanResult.getDevice();
+                arrayList.add(bluetoothDevice.getName());
+            }
         }
 
         @Override
         public void onScanFailed(int errorCode) {
 //            super.onScanFailed(errorCode);
-            Log.d("scan", "Error Code: " + errorCode);
+            Log.d(TAG, "Error Code: " + errorCode);
         }
     };
 
-    private BluetoothLeScanner bluetoothLeScanner =
-            BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner();
+    ScanSettings scanSettings = new ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
+            .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
+            .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE)
+            .setNumOfMatches(ScanSettings.MATCH_NUM_ONE_ADVERTISEMENT)
+            .setReportDelay(0L)
+            .build();
+
+    BluetoothLeScanner bluetoothLeScanner;
     private boolean mScanning;
     private Handler handler = new Handler();
 
     // Stops scanning after 10 seconds.
-    private static final long SCAN_PERIOD = 30000;
 
-    private void scanLeDevice() {
-        if (!mScanning) {
-            // Stops scanning after a pre-defined scan period.
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mScanning = false;
-                    bluetoothLeScanner.stopScan(scanCallback);
-                }
-            }, SCAN_PERIOD);
+    private void doScan() {
+        if (bluetoothLeScanner != null) {
+            Log.d(TAG, "scan started");
+            if (!mScanning) {
+                // Stops scanning after a pre-defined scan period.
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mScanning = false;
+                        bluetoothLeScanner.stopScan(scanCallback);
+                        arrayList.addAll(hashSetNames);
+                    }
+                }, SCAN_PERIOD);
 
-            mScanning = true;
-            bluetoothLeScanner.startScan(scanCallback);
+                mScanning = true;
+                arrayList.clear();
+                bluetoothLeScanner.startScan(null, scanSettings, scanCallback);
+            } else {
+                mScanning = false;
+                bluetoothLeScanner.stopScan(scanCallback);
+            }
         } else {
-            mScanning = false;
-            bluetoothLeScanner.stopScan(scanCallback);
+            Log.d(TAG, "could not get scanner object");
+        }
+    }
+
+    private void doScanWithNames() {
+        if (bluetoothLeScanner != null) {
+            bluetoothLeScanner.startScan(scanFilterList, scanSettings, scanCallback);
+            Log.d(TAG, "scan started");
+        }  else {
+            Log.d(TAG, "could not get scanner object");
         }
     }
 
@@ -94,10 +125,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        hashSetNames = new HashSet<>();
+        bluetoothLeScanner = BluetoothAdapter.getDefaultAdapter().getBluetoothLeScanner();
+        spinner = (Spinner) findViewById(R.id.spinner);
+        arrayList = new ArrayList<>();
+        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, arrayList);
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(arrayAdapter);
+
         final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
         final int REQUEST_ENABLE_BT = 1;
 //        bleScanCallback = new BLEScanCallback();
-        textView = (TextView)findViewById(R.id.textView);
+        textView = (TextView) findViewById(R.id.textView);
 
         ActivityCompat.requestPermissions(
                 this,
@@ -110,23 +150,6 @@ public class MainActivity extends AppCompatActivity {
                         }, 0);
 
 
-//        if (Build.VERSION.SDK_INT >= 23) {
-//            if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//                builder.setTitle("This app needs location access");
-//                builder.setMessage("Please grant location access so this app can detect peripherals.");
-//                builder.setPositiveButton(android.R.string.ok, null);
-//                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//                    @RequiresApi(api = Build.VERSION_CODES.M)
-//                    @Override
-//                    public void onDismiss(DialogInterface dialog) {
-//                        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
-//                    }
-//                });
-//                builder.show();
-//            }
-//        }
-
         // Initializes Bluetooth adapter.
         final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
@@ -138,8 +161,22 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
 
+        String[] names = new String[]{"HONOR Band 5-997"};
+        setScanFilterList(names);
+//        doScanWithNames();
+        doScan();
+    }
 
-        scanLeDevice();
+    public void setScanFilterList(String[] names) {
+        if (names != null) {
+            scanFilterList = new ArrayList<>();
+            for (String name : names) {
+                ScanFilter filter = new ScanFilter.Builder()
+                        .setDeviceName(name)
+                        .build();
+                scanFilterList.add(filter);
+            }
+        }
     }
 
 }
