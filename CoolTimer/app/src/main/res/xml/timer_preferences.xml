@@ -14,4 +14,9 @@
         android:entries="@array/sound_labels"
         android:entryValues="@array/sound_values"/>
 
+    <EditTextPreference
+        android:title="timer duration"
+        android:key="timer_duration"
+        android:defaultValue="30"/>
+
 </PreferenceScreen>

@@ -2,14 +2,15 @@ package com.example.cooltimer;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
+import androidx.preference.PreferenceScreen;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -18,29 +19,37 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     private SeekBar seekBar;
     private Button button;
-    private TextView textview;
+    private TextView textView;
     private CountDownTimer countDownTimer;
     private MediaPlayer mediaPlayer;
 
     private int minutes;
     private int seconds;
     private int maxSeekBar = 600;
+    private int timerDuration;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        PreferenceManager.getDefaultSharedPreferences(this).edit().clear().apply();
 
         seekBar = findViewById(R.id.seekBar);
         button = findViewById(R.id.button);
-        textview = findViewById(R.id.textView);
+        textView = findViewById(R.id.textView);
 
         seekBar.setMax(maxSeekBar);
-        seekBar.setProgress(30);
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
+        setTimerDurationFromSharedPreferences(sharedPreferences,"timer_duration");
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
@@ -63,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//                sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 String melody = sharedPreferences.getString("songs", "bell");
 
                 if (button.getText().equals("Start")) {
@@ -96,7 +105,16 @@ public class MainActivity extends AppCompatActivity {
                     seekBar.setEnabled(true);
                     countDownTimer.cancel();
                     mediaPlayer.stop();
+                    setTimerDurationFromSharedPreferences(sharedPreferences, "timer_duration");
                 }
+            }
+        });
+
+//        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                setTimerDurationFromSharedPreferences(sharedPreferences, key);
             }
         });
     }
@@ -106,15 +124,15 @@ public class MainActivity extends AppCompatActivity {
         seconds = progress - (minutes * 60);
 
         if (progress == 0) {
-            textview.setText("00:00");
+            textView.setText("00:00");
         } else if (progress == maxSeekBar) {
-            textview.setText("10:00");
+            textView.setText("10:00");
         } else if (seconds <= 9) {
-            textview.setText("0" + minutes);
-            textview.append(":" + "0" + seconds);
+            textView.setText("0" + minutes);
+            textView.append(":" + "0" + seconds);
         } else {
-            textview.setText("0" + minutes);
-            textview.append(":" + seconds);
+            textView.setText("0" + minutes);
+            textView.append(":" + seconds);
         }
     }
 
@@ -140,5 +158,23 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setTimerDurationFromSharedPreferences(SharedPreferences sharedPreferences, String key){
+        timerDuration = Integer.valueOf(sharedPreferences.getString(key, "30"));
+        seekBar.setProgress(timerDuration);
+        updateViewText(timerDuration);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (!(key.equals("timer_duration"))) return;
+        setTimerDurationFromSharedPreferences(sharedPreferences, key);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 }
