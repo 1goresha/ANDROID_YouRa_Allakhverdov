@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -26,23 +27,24 @@ import java.util.HashSet;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-//    BLEScanCallback bleScanCallback;
 
     final String TAG = "scan";
     List<ScanFilter> scanFilterList;
-    final int SCAN_PERIOD = 10000;
+    final int SCAN_PERIOD = 5000;
     TextView textView;
     Spinner spinner;
     List<String> arrayList;
     ArrayAdapter arrayAdapter;
     HashSet<String> hashSetNames;
+    ListView devices;
+
 
     // Device scan callback.
     private final ScanCallback scanCallback = new ScanCallback() {
 
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
-//            super.onScanResult(callbackType, result);
+            super.onScanResult(callbackType, result);
             BluetoothDevice bluetoothDevice = result.getDevice();
             Log.d(TAG, "Scan Success");
             String deviceName = bluetoothDevice.getName();
@@ -55,19 +57,14 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBatchScanResults(List<ScanResult> results) {
-//            super.onBatchScanResults(results);
+            super.onBatchScanResults(results);
             Log.d(TAG, "Scan Success Batch");
-            arrayList.clear();
-            BluetoothDevice bluetoothDevice;
-            for (ScanResult scanResult : results){
-                bluetoothDevice = scanResult.getDevice();
-                arrayList.add(bluetoothDevice.getName());
-            }
+            arrayList.addAll(hashSetNames);
         }
 
         @Override
         public void onScanFailed(int errorCode) {
-//            super.onScanFailed(errorCode);
+            super.onScanFailed(errorCode);
             Log.d(TAG, "Error Code: " + errorCode);
         }
     };
@@ -77,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
             .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE)
             .setNumOfMatches(ScanSettings.MATCH_NUM_ONE_ADVERTISEMENT)
-            .setReportDelay(0L)
+            .setReportDelay(2000L)
             .build();
 
     BluetoothLeScanner bluetoothLeScanner;
@@ -86,7 +83,32 @@ public class MainActivity extends AppCompatActivity {
 
     // Stops scanning after 10 seconds.
 
-    private void doScan() {
+    private void scan() {
+        if (bluetoothLeScanner != null) {
+            Log.d(TAG, "scan started");
+            if (!mScanning) {
+                // Stops scanning after a pre-defined scan period.
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mScanning = false;
+                        bluetoothLeScanner.stopScan(scanCallback);
+                    }
+                }, SCAN_PERIOD);
+
+                mScanning = true;
+                arrayList.clear();
+                bluetoothLeScanner.startScan(scanFilterList, scanSettings, scanCallback);
+            } else {
+                mScanning = false;
+                bluetoothLeScanner.stopScan(scanCallback);
+            }
+        } else {
+            Log.d(TAG, "could not get scanner object");
+        }
+    }
+
+    private void scanAll() {
         if (bluetoothLeScanner != null) {
             Log.d(TAG, "scan started");
             if (!mScanning) {
@@ -102,21 +124,12 @@ public class MainActivity extends AppCompatActivity {
 
                 mScanning = true;
                 arrayList.clear();
-                bluetoothLeScanner.startScan(null, scanSettings, scanCallback);
+                bluetoothLeScanner.startScan(scanCallback);
             } else {
                 mScanning = false;
                 bluetoothLeScanner.stopScan(scanCallback);
             }
         } else {
-            Log.d(TAG, "could not get scanner object");
-        }
-    }
-
-    private void doScanWithNames() {
-        if (bluetoothLeScanner != null) {
-            bluetoothLeScanner.startScan(scanFilterList, scanSettings, scanCallback);
-            Log.d(TAG, "scan started");
-        }  else {
             Log.d(TAG, "could not get scanner object");
         }
     }
@@ -134,10 +147,10 @@ public class MainActivity extends AppCompatActivity {
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(arrayAdapter);
 
-        final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
         final int REQUEST_ENABLE_BT = 1;
-//        bleScanCallback = new BLEScanCallback();
-        textView = (TextView) findViewById(R.id.textView);
+        textView = (TextView) findViewById(R.id.devicesTextView);
+
+        devices = (ListView) findViewById(R.id.devicesListView);
 
         ActivityCompat.requestPermissions(
                 this,
@@ -164,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
         String[] names = new String[]{"HONOR Band 5-997"};
         setScanFilterList(names);
 //        doScanWithNames();
-        doScan();
+        scan();
     }
 
     public void setScanFilterList(String[] names) {

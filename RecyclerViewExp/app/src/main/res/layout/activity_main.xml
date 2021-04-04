@@ -13,5 +13,5 @@
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="1dp"
         android:scrollbars="vertical"
-        android:background="@android:color/holo_blue_dark"/>
+        android:background="@android:color/white"/>
 </RelativeLayout>
