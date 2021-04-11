@@ -2,33 +2,66 @@ package com.example.myfavoritemovies;
 
 import android.os.Bundle;
 
+import com.example.myfavoritemovies.databinding.ActivityMainBinding;
+import com.example.myfavoritemovies.model.Genre;
+import com.example.myfavoritemovies.model.Movie;
+import com.example.myfavoritemovies.viewmodel.MainActivityViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    private MainActivityViewModel viewModel;
+    private ActivityMainBinding activityMainBinding;
+    private MainActivityClickHandler clickHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+//        setContentView(R.layout.activity_main);
+
+        clickHandler = new MainActivityClickHandler();
+        activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        activityMainBinding.setMainActivityClickedHandler(clickHandler);
+
+        viewModel = new ViewModelProvider.AndroidViewModelFactory(getApplication()).create(MainActivityViewModel.class);
+        viewModel.getGenres().observe(this, new Observer<List<Genre>>() {
+            @Override
+            public void onChanged(List<Genre> genres) {
+                for (Genre g :
+                        genres) {
+                    Log.d("MyLog", g.getGenreName());
+                }
+            }
+        });
+
+        viewModel.getMoviesByGenreId(2).observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(List<Movie> movies) {
+                for (Movie m :
+                        movies) {
+                    Log.d("MyLog", m.getName());
+                }
+            }
+        });
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
     }
 
     @Override
@@ -51,5 +84,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public class MainActivityClickHandler{
+
+        public void onFabClick(View view){
+
+            Toast.makeText(MainActivity.this, "Fab is clicked", Toast.LENGTH_SHORT).show();
+        }
     }
 }
