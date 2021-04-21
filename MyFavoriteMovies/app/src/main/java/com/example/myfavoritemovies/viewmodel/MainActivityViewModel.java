@@ -8,9 +8,7 @@ import androidx.lifecycle.LiveData;
 
 import com.example.myfavoritemovies.model.AppRepository;
 import com.example.myfavoritemovies.model.Genre;
-import com.example.myfavoritemovies.model.GenreDao;
 import com.example.myfavoritemovies.model.Movie;
-import com.example.myfavoritemovies.model.MovieDao;
 
 import java.util.List;
 

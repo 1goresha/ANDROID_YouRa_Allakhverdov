@@ -10,7 +10,7 @@ import java.util.List;
 public class AppRepository {
 
     private GenreDao genreDao;
-    private  MovieDao movieDao;
+    private MovieDao movieDao;
 
     private MoviesDatabase database;
 
