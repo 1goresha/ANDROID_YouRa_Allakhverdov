@@ -17,7 +17,7 @@ public abstract class MoviesDatabase extends RoomDatabase {
     abstract GenreDao getGenreDao();
     abstract MovieDao getMovieDao();
 
-    public static synchronized MoviesDatabase getInstance(Context context){
+    public static synchronized MoviesDatabase getInstance(Context context){         //паттерн синглтон
 
         if (instance == null){
 
