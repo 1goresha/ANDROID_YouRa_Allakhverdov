@@ -1,14 +1,13 @@
 package com.example.myfavoritemovies;
 
 import android.os.Bundle;
-
-import com.example.myfavoritemovies.databinding.ActivityMainBinding;
-import com.example.myfavoritemovies.model.Genre;
-import com.example.myfavoritemovies.model.Movie;
-import com.example.myfavoritemovies.viewmodel.MainActivityViewModel;
-import com.example.myfavoritemovies.viewmodel.MovieAdapter;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -18,15 +17,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Toast;
+import com.example.myfavoritemovies.databinding.ActivityMainBinding;
+import com.example.myfavoritemovies.model.Genre;
+import com.example.myfavoritemovies.model.Movie;
+import com.example.myfavoritemovies.viewmodel.MainActivityViewModel;
+import com.example.myfavoritemovies.viewmodel.MovieAdapter;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,10 +1,9 @@
 package com.example.myfavoritemovies.viewmodel;
 
-import android.content.Context;
+import android.graphics.Movie;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -12,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myfavoritemovies.R;
 import com.example.myfavoritemovies.databinding.MovieListItemBinding;
-import com.example.myfavoritemovies.model.Movie;
 
 import java.util.ArrayList;
 import java.util.List;

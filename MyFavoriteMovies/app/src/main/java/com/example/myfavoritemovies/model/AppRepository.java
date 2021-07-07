@@ -14,7 +14,7 @@ public class AppRepository {
 
     private MoviesDatabase database;
 
-    public AppRepository(Application application){
+    public AppRepository(Application application) {
 
         database = MoviesDatabase.getInstance(application);
 
@@ -23,8 +23,9 @@ public class AppRepository {
     }
 
 
+    //-----------------------------------------------------------------------------------------------------------------
 
-    public void insertGenre(Genre genre){
+    public void insertGenre(Genre genre) {
 
         new InsertGenreAsyncTask(genreDao).execute(genre);
     }
@@ -33,7 +34,7 @@ public class AppRepository {
 
         private GenreDao genreDao;
 
-        public InsertGenreAsyncTask(GenreDao genreDao){
+        public InsertGenreAsyncTask(GenreDao genreDao) {
 
             this.genreDao = genreDao;
         }
@@ -47,16 +48,18 @@ public class AppRepository {
         }
     }
 
-    public void insertMovie(Movie movie){
+    //-----------------------------------------------------------------------------------------------------------------
+
+    public void insertMovie(Movie movie) {
 
         new InsertMovieAsyncTask(movieDao).execute(movie);
     }
 
-    private static class InsertMovieAsyncTask extends AsyncTask<Movie, Void, Void>{
+    private static class InsertMovieAsyncTask extends AsyncTask<Movie, Void, Void> {
 
         private MovieDao movieDao;
 
-        public InsertMovieAsyncTask(MovieDao movieDao){
+        public InsertMovieAsyncTask(MovieDao movieDao) {
 
             this.movieDao = movieDao;
         }
@@ -71,9 +74,9 @@ public class AppRepository {
     }
 
 
+    //-----------------------------------------------------------------------------------------------------------------
 
-
-    public void updateGenre(Genre genre){
+    public void updateGenre(Genre genre) {
 
         new UpdateGenreAsyncTask(genreDao).execute(genre);
     }
@@ -82,7 +85,7 @@ public class AppRepository {
 
         private GenreDao genreDao;
 
-        public UpdateGenreAsyncTask(GenreDao genreDao){
+        public UpdateGenreAsyncTask(GenreDao genreDao) {
 
             this.genreDao = genreDao;
         }
@@ -96,16 +99,18 @@ public class AppRepository {
         }
     }
 
-    public void updateMovie(Movie movie){
+    //-----------------------------------------------------------------------------------------------------------------
+
+    public void updateMovie(Movie movie) {
 
         new UpdateMovieAsyncTask(movieDao).execute(movie);
     }
 
-    private static class UpdateMovieAsyncTask extends AsyncTask<Movie, Void, Void>{
+    private static class UpdateMovieAsyncTask extends AsyncTask<Movie, Void, Void> {
 
         private MovieDao movieDao;
 
-        public UpdateMovieAsyncTask(MovieDao movieDao){
+        public UpdateMovieAsyncTask(MovieDao movieDao) {
 
             this.movieDao = movieDao;
         }
@@ -119,9 +124,10 @@ public class AppRepository {
         }
     }
 
+    //-----------------------------------------------------------------------------------------------------------------
 
 
-    public void deleteGenre(Genre genre){
+    public void deleteGenre(Genre genre) {
 
         new DeleteGenreAsyncTask(genreDao).execute(genre);
     }
@@ -130,7 +136,7 @@ public class AppRepository {
 
         private GenreDao genreDao;
 
-        public DeleteGenreAsyncTask(GenreDao genreDao){
+        public DeleteGenreAsyncTask(GenreDao genreDao) {
 
             this.genreDao = genreDao;
         }
@@ -144,16 +150,18 @@ public class AppRepository {
         }
     }
 
-    public void deleteMovie(Movie movie){
+    //-----------------------------------------------------------------------------------------------------------------
+
+    public void deleteMovie(Movie movie) {
 
         new DeleteMovieAsyncTask(movieDao).execute(movie);
     }
 
-    private static class DeleteMovieAsyncTask extends AsyncTask<Movie, Void, Void>{
+    private static class DeleteMovieAsyncTask extends AsyncTask<Movie, Void, Void> {
 
         private MovieDao movieDao;
 
-        public DeleteMovieAsyncTask(MovieDao movieDao){
+        public DeleteMovieAsyncTask(MovieDao movieDao) {
 
             this.movieDao = movieDao;
         }
@@ -167,13 +175,14 @@ public class AppRepository {
         }
     }
 
+    //-----------------------------------------------------------------------------------------------------------------
 
-    public LiveData<List<Genre>> getAllGenres(){
+    public LiveData<List<Genre>> getAllGenres() {
 
         return genreDao.getAllGenres();
     }
 
-    public LiveData<List<Movie>> getAllMoviesByGenreId(int genreId){
+    public LiveData<List<Movie>> getAllMoviesByGenreId(int genreId) {
 
         return movieDao.getAllMoviesByGenreId(genreId);
     }
