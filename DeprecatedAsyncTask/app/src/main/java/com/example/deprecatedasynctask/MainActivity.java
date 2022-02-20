@@ -13,17 +13,24 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+
+import com.example.deprecatedasynctask.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
     private TextView textView, textView2;
     private MyAsyncTask myAsyncTask;
     private Handler handler;
+    private ActivityMainBinding activityMainBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
 
         handler = new Handler(Looper.myLooper()) {
 
@@ -83,17 +90,25 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void doAsyncTask2(View view) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
 
-        for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 100; i++) {
             textView.setText(i + "");
+//                    activityMainBinding.setHeartRate(i + "");
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
             }
+        }).start();
 
-        }
+
 //        myAsyncTask.execute();
     }
 

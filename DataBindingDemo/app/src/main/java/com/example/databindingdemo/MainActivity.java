@@ -20,7 +20,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
         activityMainBinding.setBook(createBook());
 
         MainActivityButtonHandler mainActivityButtonHandler = new MainActivityButtonHandler(this);

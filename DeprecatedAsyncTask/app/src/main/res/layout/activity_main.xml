@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--<layout>-->
+<layout>
 
-<!--    <data>-->
+    <data>
 
-<!--        <variable-->
-<!--            name=""-->
-<!--            type="" />-->
+        <variable
+            name="heartRate"
+            type="String" />
 
-<!--    </data>-->
+    </data>
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -64,7 +64,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginStart="50dp"
             android:layout_marginTop="50dp"
-            android:text="TextView" />
+            android:text="@{heartRate}" />
 
         <TextView
             android:id="@+id/textView2"
@@ -87,5 +87,5 @@
             android:layout_marginTop="50dp" />
     </RelativeLayout>
 
-<!--</layout>-->
+</layout>
 
